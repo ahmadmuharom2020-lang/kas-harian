@@ -1,0 +1,1219 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1, user-scalable=no" />
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="theme-color" content="#2C4A43" />
+<title>Tenang Finance - Project Tenang</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@500;600&display=swap');
+
+  :root {
+    --bg:#F6F3EC; --card:#FFFFFF; --ink:#1E2A28; --ink-soft:#5B6663;
+    --primary:#2C4A43; --primary-dark:#1B302B; --income:#A8791F; --income-bg:#FBF1DC;
+    --expense:#8B3A3A; --expense-bg:#F8E9E7; --line:#DED7C7; --danger:#E11D2E;
+  }
+  * { box-sizing: border-box; }
+  html, body { margin:0; padding:0; background:var(--bg); }
+  body { color:var(--ink); font-family:'IBM Plex Sans', system-ui, -apple-system, sans-serif; padding-bottom:48px; }
+  .font-display { font-family:'Fraunces', Georgia, serif; }
+  .mono { font-family:'IBM Plex Mono', 'Courier New', monospace; font-variant-numeric: tabular-nums; }
+
+  .container { max-width: 640px; margin:0 auto; padding: 0 20px; }
+
+  .app-header { background: var(--primary); color:#fff; padding: 20px 0 16px; }
+  .eyebrow { font-size:12px; letter-spacing:.15em; text-transform:uppercase; opacity:.7; margin:0 0 2px; }
+  .title { font-size:24px; margin:0 0 12px; color:#F3E9C7; }
+
+  .pill-row { display:flex; gap:8px; align-items:center; margin-bottom:12px; flex-wrap:wrap; }
+  .pill { border:none; padding:6px 14px; border-radius:999px; font-size:13px; font-weight:500; cursor:pointer; background:var(--card); color:var(--ink); border:1px solid var(--line); }
+  .pill.active { background:var(--primary); color:#fff; border-color:var(--primary); }
+  .save-indicator { font-size:12px; opacity:.6; }
+
+  .stat-grid { display:grid; grid-template-columns: repeat(3, 1fr); gap:8px; }
+  .stat-box { border-radius:12px; padding:8px; background:rgba(255,255,255,0.08); min-width:0; }
+  .stat-box.highlight { background:#F3E9C7; color:var(--primary-dark); }
+  .stat-label { display:flex; align-items:center; gap:4px; font-size:11px; opacity:.7; margin-bottom:2px; }
+  .stat-value { font-size:14px; font-weight:600; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+
+  .content { margin-top: -8px; }
+  .card { background:var(--card); border:1px solid var(--line); border-radius:18px; margin-bottom:12px; overflow:hidden; }
+  .card-pad { padding:12px 16px; }
+  .card-head { padding:12px 16px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--line); }
+  .card-title { font-weight:500; display:flex; align-items:center; gap:8px; }
+
+  .fh-banner { border-radius:16px; padding:8px 12px; margin-bottom:12px; }
+  .fh-line1 { display:flex; align-items:center; gap:8px; }
+  .fh-line2 { font-size:12px; margin-top:2px; opacity:.85; }
+
+  .banner-danger { background:var(--danger); color:#fff; border-radius:18px; padding:16px; margin-bottom:12px; }
+  .banner-danger .head { display:flex; align-items:center; gap:8px; font-weight:600; margin-bottom:12px; }
+  .banner-danger .item { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:8px 0; border-top:1px solid rgba(255,255,255,0.25); }
+  .banner-danger .item:first-child { border-top:none; }
+  .banner-danger .name { font-weight:600; font-size:14px; }
+  .banner-danger .meta { font-size:12px; opacity:.9; }
+  .btn-white { background:#fff; color:var(--danger); border:none; font-weight:600; font-size:12px; padding:6px 12px; border-radius:10px; cursor:pointer; flex-shrink:0; }
+
+  .btn { border:none; border-radius:10px; font-size:14px; cursor:pointer; padding:10px 14px; font-weight:600; display:inline-flex; align-items:center; justify-content:center; gap:6px; }
+  .btn-block { width:100%; }
+  .btn-primary { background:var(--primary); color:#fff; }
+  .btn-outline { background:transparent; border:1px solid var(--line); color:var(--ink); }
+  .btn-soft-income { background:var(--income-bg); color:var(--income); }
+  .btn-soft-expense { background:var(--expense-bg); color:var(--expense); }
+  .btn-sm { font-size:12px; padding:6px 10px; border-radius:8px; }
+  .btn:disabled { background:var(--bg); color:var(--ink-soft); cursor:not-allowed; }
+
+  .icon-btn { background:none; border:none; cursor:pointer; opacity:.4; padding:2px; color:var(--ink); }
+  .icon-btn:hover { opacity:1; }
+
+  .chip-row { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:8px; align-items:center; }
+  .chip { border:none; border-radius:10px; padding:6px 10px; font-size:13px; font-weight:500; background:var(--income-bg); color:var(--income); cursor:pointer; }
+
+  .digit-box { background:var(--primary-dark); color:#F3E9C7; border-radius:8px; padding:3px 7px; font-size:13px; font-weight:600; box-shadow: inset 0 2px 4px rgba(0,0,0,0.5), inset 0 -1px 0 rgba(255,255,255,0.08); }
+
+  .row-between { display:flex; align-items:center; justify-content:space-between; gap:12px; }
+  .text-xs { font-size:12px; }
+  .text-sm { font-size:14px; }
+  .ink-soft { color:var(--ink-soft); }
+  .mb-1 { margin-bottom:4px; } .mb-2 { margin-bottom:8px; } .mb-3 { margin-bottom:12px; }
+  .mt-1 { margin-top:4px; } .mt-2 { margin-top:8px; }
+
+  label.field-label { font-size:12px; color:var(--ink-soft); display:block; margin-bottom:4px; }
+  .input, select.input, textarea.input {
+    width:100%; padding:8px 10px; border-radius:10px; border:1px solid var(--line); font-size:14px; font-family:inherit; background:#fff; color:var(--ink);
+  }
+  textarea.input { resize:vertical; }
+  .input.error { border-color: var(--expense); }
+  .form-row-2 { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
+
+  .type-toggle { display:flex; border:1px solid var(--line); border-radius:10px; overflow:hidden; margin-bottom:8px; }
+  .type-toggle button { flex:1; border:none; background:transparent; padding:8px; font-size:14px; font-weight:500; cursor:pointer; color:var(--ink-soft); }
+  .type-toggle button.active-income { background:var(--income-bg); color:var(--income); }
+  .type-toggle button.active-expense { background:var(--expense-bg); color:var(--expense); }
+
+  .error-text { font-size:12px; color:var(--expense); margin-bottom:8px; }
+
+  .table-wrap { overflow:auto; max-height:340px; }
+  table { width:100%; border-collapse:collapse; font-size:14px; }
+  th { text-align:left; font-weight:500; font-size:12px; color:var(--ink-soft); padding:8px 16px; }
+  td { padding:8px 16px; border-top:1px solid var(--line); vertical-align:middle; }
+  .amount-income { color:var(--income); font-weight:500; }
+  .amount-expense { color:var(--expense); font-weight:500; }
+  .empty-state { padding:24px; text-align:center; font-size:14px; color:var(--ink-soft); }
+  .row-income { background:#DFF5E3; }
+
+  .loan-row { padding:12px 16px; border-top:1px solid var(--line); }
+  .loan-stats { display:grid; grid-template-columns:1fr 1fr; gap:8px; margin-bottom:8px; }
+  .loan-stat-box { border-radius:10px; padding:8px; background:var(--bg); }
+  .badge-paid { font-size:12px; font-weight:600; padding:2px 8px; border-radius:999px; background:var(--income-bg); color:var(--income); }
+
+  .modal-overlay { position:fixed; inset:0; background:rgba(0,0,0,0.45); display:flex; align-items:flex-end; justify-content:center; padding:16px; z-index:50; }
+  .modal-box { width:100%; max-width:380px; background:#fff; border-radius:18px; padding:20px; }
+
+  .hidden { display:none !important; }
+  .flex-1 { flex:1; }
+  .truncate { overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+  svg.icon { flex-shrink:0; vertical-align:middle; }
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+  import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+  var firebaseConfig = {
+    apiKey: "AIzaSyCewjm4yIH4tf0jnVOSzJ-Dno5atHr9L-g",
+    authDomain: "kas-harian-ahmad.firebaseapp.com",
+    projectId: "kas-harian-ahmad",
+    storageBucket: "kas-harian-ahmad.firebasestorage.app",
+    messagingSenderId: "474351105172",
+    appId: "1:474351105172:web:8de81c5d0bf88abfa93081",
+    measurementId: "G-3NGSPQ87P6"
+  };
+
+  var app = initializeApp(firebaseConfig);
+  var db = getFirestore(app);
+
+  window.__fsDb = db;
+  window.__fsDoc = doc;
+  window.__fsGetDoc = getDoc;
+  window.__fsSetDoc = setDoc;
+</script>
+<script>
+/* ================================================================
+   TENANG FINANCE - versi standalone (Tahap 1+2)
+   Cakupan yang SUDAH ada di file ini:
+     - Kas Harian (catat transaksi, riwayat collapsible, filter Hari Ini/Bulan/Semua)
+     - Kesehatan Finansial (skor ringkas 1 baris)
+     - Tally Tip
+     - Reminder terpadu: Pinjaman jatuh tempo + Perawatan Kendaraan
+     - Pinjaman (Tunai/Barang, sisa uang tunai terlacak, "Sumber Dana" di form transaksi)
+     - Dana Darurat (target otomatis 6 bulan pengeluaran, nabung/tarik)
+     - Perawatan Kendaraan (multi-jenis, dasar - belum ada "buku riwayat servis" penuh)
+     - Backup & Restore
+
+   BELUM ada di file ini (menyusul di sesi berikutnya):
+     - Data Saham, Transaksi Saham, Target Portofolio, Kalender Dividen
+     - Kalkulator Saham, Kalkulator Zakat Maal, Jurnal Investasi
+     - Budget Kategori, Riwayat Nilai Portofolio (grafik), Arsip & Laporan Tahunan
+   ================================================================ */
+
+/* ================= Helpers ================= */
+var STORAGE_KEY = 'kas-harian-store-v1';
+var ACCESS_CODE_KEY = 'kas-harian-access-code';
+var accessCode = localStorage.getItem(ACCESS_CODE_KEY) || '';
+
+var DEFAULT_CATEGORIES = {
+  income: ['Tarif Order', 'Tip', 'Bonus Mitra'],
+  expense: ['Bensin', 'Ganti Oli', 'Makan', 'Parkir', 'Servis Motor', 'Pulsa/Data', 'Lainnya']
+};
+var TIP_PRESETS = [2000, 5000, 10000];
+
+function todayStr() {
+  var d = new Date();
+  var off = d.getTimezoneOffset();
+  var local = new Date(d.getTime() - off * 60000);
+  return local.toISOString().slice(0, 10);
+}
+function formatRupiah(n) {
+  n = n || 0;
+  return 'Rp' + Math.round(n).toLocaleString('id-ID');
+}
+function uid() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+function formatDMY(dateStr) {
+  if (!dateStr) return '-';
+  var parts = dateStr.split('-');
+  return parts[2] + '/' + parts[1] + '/' + parts[0];
+}
+function daysUntil(dateStr) {
+  var target = new Date(dateStr + 'T00:00:00');
+  var today = new Date(todayStr() + 'T00:00:00');
+  return Math.round((target - today) / 86400000);
+}
+function addMonths(dateStr, n) {
+  var parts = dateStr.split('-').map(Number);
+  var dt = new Date(parts[0], parts[1] - 1 + n, parts[2]);
+  var yy = dt.getFullYear();
+  var mm = String(dt.getMonth() + 1).padStart(2, '0');
+  var dd = String(dt.getDate()).padStart(2, '0');
+  return yy + '-' + mm + '-' + dd;
+}
+function addDays(dateStr, n) {
+  var dt = new Date(dateStr + 'T00:00:00');
+  dt.setDate(dt.getDate() + n);
+  var yy = dt.getFullYear();
+  var mm = String(dt.getMonth() + 1).padStart(2, '0');
+  var dd = String(dt.getDate()).padStart(2, '0');
+  return yy + '-' + mm + '-' + dd;
+}
+function escapeHtml(str) {
+  if (str === null || str === undefined) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;');
+}
+function mergeTipIntoTransactions(txs, date, amountToAdd) {
+  var idx = -1;
+  for (var i = 0; i < txs.length; i++) {
+    if (txs[i].type === 'income' && txs[i].category === 'Tip' && txs[i].date === date) { idx = i; break; }
+  }
+  if (idx >= 0) {
+    var updated = txs.slice();
+    updated[idx] = Object.assign({}, updated[idx], { amount: updated[idx].amount + amountToAdd });
+    return updated;
+  }
+  return [{ id: uid(), date: date, type: 'income', category: 'Tip', note: 'Setoran tally tip harian', amount: amountToAdd, createdAt: Date.now() }].concat(txs);
+}
+function isValidBackup(obj) {
+  return !!(obj && typeof obj === 'object' && Array.isArray(obj.transactions) && obj.categories &&
+    Array.isArray(obj.categories.income) && Array.isArray(obj.categories.expense));
+}
+
+/* ================= Icons (SVG kecil, tanpa library luar) ================= */
+function icon(paths, size) {
+  size = size || 16;
+  return '<svg class="icon" width="' + size + '" height="' + size + '" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">' + paths + '</svg>';
+}
+var ICONS = {
+  plus: icon('<line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/>'),
+  x: icon('<line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>', 12),
+  check: icon('<polyline points="20 6 9 17 4 12"/>'),
+  trash: icon('<polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/>', 14),
+  pencil: icon('<path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"/>', 14),
+  up: icon('<polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/>', 12),
+  down: icon('<polyline points="23 18 13.5 8.5 8.5 13.5 1 6"/><polyline points="17 18 23 18 23 12"/>', 12),
+  wallet: icon('<path d="M21 12V7H5a2 2 0 0 1 0-4h14v4"/><path d="M3 5v14a2 2 0 0 0 2 2h16v-5"/><path d="M18 12a2 2 0 0 0 0 4h4v-4Z"/>', 12),
+  coins: icon('<circle cx="8" cy="8" r="6"/><path d="M18.09 10.37A6 6 0 1 1 10.34 18"/>', 16),
+  download: icon('<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/>', 14),
+  upload: icon('<path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/>', 14),
+  copy: icon('<rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>', 14),
+  shield: icon('<path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/>', 16),
+  chevron: icon('<polyline points="6 9 12 15 18 9"/>', 16),
+  landmark: icon('<line x1="3" y1="22" x2="21" y2="22"/><line x1="6" y1="18" x2="6" y2="11"/><line x1="10" y1="18" x2="10" y2="11"/><line x1="14" y1="18" x2="14" y2="11"/><line x1="18" y1="18" x2="18" y2="11"/><polygon points="12 2 20 7 4 7 12 2"/>', 16),
+  alert: icon('<path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/>', 18),
+  wrench: icon('<path d="M14.7 6.3a1 1 0 0 0 0 1.4l1.6 1.6a1 1 0 0 0 1.4 0l3.77-3.77a6 6 0 0 1-7.94 7.94l-6.91 6.91a2.12 2.12 0 0 1-3-3l6.91-6.91a6 6 0 0 1 7.94-7.94l-3.76 3.76z"/>', 16),
+  gauge: icon('<path d="M12 14 15 11"/><circle cx="12" cy="12" r="10"/><path d="M12 6v2M18 12h2M4 12h2"/>', 15)
+};
+
+/* ================= State ================= */
+var state = {
+  categories: JSON.parse(JSON.stringify(DEFAULT_CATEGORIES)),
+  transactions: [],
+  tally: { date: todayStr(), count: 0, total: 0 },
+  loans: [],
+  emergencyTx: [],
+  vehicleMaintenanceTypes: [{ id: uid(), name: 'Ganti Oli', category: 'Ganti Oli', intervalDays: 15 }],
+  filter: 'today',
+  cloudStatus: 'idle',
+
+  manualTipAmount: '',
+
+  txType: 'income',
+  txCategory: DEFAULT_CATEGORIES.income[0],
+  txShowNewCat: false,
+  txNewCatName: '',
+  txAmount: '',
+  txNote: '',
+  txDate: todayStr(),
+  txEditingId: null,
+  txFormError: '',
+  txSourceLoanId: '',
+
+  showRiwayat: false,
+
+  showLoanForm: false,
+  loanEditingId: null,
+  loanAppName: '',
+  loanTenor: '',
+  loanInstallment: '',
+  loanDueDate: '',
+  loanType: 'tunai',
+  loanItemName: '',
+  loanCashAmount: '',
+  loanFormError: '',
+
+  showEmergencyForm: false,
+  emergencyEditingId: null,
+  emergencyType: 'nabung',
+  emergencyAmount: '',
+  emergencyDate: todayStr(),
+  emergencyNote: '',
+  emergencyFormError: '',
+
+  showVehicleModal: false,
+  showVehicleTypeForm: false,
+  vehicleTypeName: '',
+  vehicleTypeInterval: '',
+  vehicleTypeFormError: '',
+
+  showBackupPanel: false,
+  backupMsg: '',
+  restoreText: '',
+  restoreMsg: '',
+  pendingRestore: null
+};
+
+/* ================= Persistence ================= */
+function loadData() {
+  try {
+    var raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) return;
+    var parsed = JSON.parse(raw);
+    applyLoadedData(parsed);
+  } catch (e) {
+    console.error('Gagal memuat data', e);
+  }
+}
+function applyLoadedData(parsed) {
+  var cats = parsed.categories || DEFAULT_CATEGORIES;
+  var txs = parsed.transactions || [];
+  var tly = parsed.tally || { date: todayStr(), count: 0, total: 0 };
+  var lns = Array.isArray(parsed.loans) ? parsed.loans : [];
+  var etx = Array.isArray(parsed.emergencyTx) ? parsed.emergencyTx : [];
+  var vmtRaw = Array.isArray(parsed.vehicleMaintenanceTypes) ? parsed.vehicleMaintenanceTypes : [];
+  var vmt = vmtRaw.length > 0 ? vmtRaw : [{ id: uid(), name: 'Ganti Oli', category: 'Ganti Oli', intervalDays: 15 }];
+
+  var today = todayStr();
+  if (tly.date !== today) {
+    if (tly.total > 0) txs = mergeTipIntoTransactions(txs, tly.date, tly.total);
+    tly = { date: today, count: 0, total: 0 };
+  }
+
+  state.categories = cats;
+  state.transactions = txs;
+  state.tally = tly;
+  state.loans = lns;
+  state.emergencyTx = etx;
+  state.vehicleMaintenanceTypes = vmt;
+  state.txCategory = (cats.income && cats.income[0]) || DEFAULT_CATEGORIES.income[0];
+}
+function currentDataForSave() {
+  return {
+    categories: state.categories,
+    transactions: state.transactions,
+    tally: state.tally,
+    loans: state.loans,
+    emergencyTx: state.emergencyTx,
+    vehicleMaintenanceTypes: state.vehicleMaintenanceTypes
+  };
+}
+function saveData() {
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(currentDataForSave()));
+  } catch (e) {
+    console.error('Gagal menyimpan data', e);
+  }
+  pushToCloud();
+}
+
+/* ================= Sinkronisasi Cloud (Firebase) ================= */
+function setAccessCode() {
+  var el = document.getElementById('accessCodeInput');
+  var val = el ? el.value.trim() : '';
+  if (!val) return;
+  localStorage.setItem(ACCESS_CODE_KEY, val);
+  accessCode = val;
+  render();
+  initCloudSync();
+}
+function gantiKodeAkses() {
+  localStorage.removeItem(ACCESS_CODE_KEY);
+  accessCode = '';
+  state.cloudStatus = 'idle';
+  render();
+}
+function applyRemoteData(cloud) {
+  applyLoadedData(cloud);
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(currentDataForSave())); } catch (e) {}
+}
+function initCloudSync() {
+  if (!accessCode) return;
+  if (!window.__fsDb) { state.cloudStatus = 'offline'; render(); return; }
+  state.cloudStatus = 'connecting';
+  render();
+  var ref = window.__fsDoc(window.__fsDb, 'kas_harian', accessCode);
+  window.__fsGetDoc(ref).then(function (snap) {
+    if (snap.exists()) {
+      applyRemoteData(snap.data());
+      state.cloudStatus = 'connected';
+      render();
+    } else {
+      var data = currentDataForSave();
+      data.updatedAt = Date.now();
+      return window.__fsSetDoc(ref, data).then(function () { state.cloudStatus = 'connected'; render(); });
+    }
+  }).catch(function (e) {
+    console.error('Gagal sinkron ke cloud', e);
+    state.cloudStatus = 'offline';
+    render();
+  });
+}
+function pushToCloud() {
+  if (!accessCode || !window.__fsDb) return;
+  var ref = window.__fsDoc(window.__fsDb, 'kas_harian', accessCode);
+  var data = currentDataForSave();
+  data.updatedAt = Date.now();
+  window.__fsSetDoc(ref, data).then(function () {
+    state.cloudStatus = 'connected';
+    render();
+  }).catch(function (e) {
+    console.error('Gagal push ke cloud', e);
+    state.cloudStatus = 'offline';
+    render();
+  });
+}
+function cloudStatusLabel() {
+  if (state.cloudStatus === 'connected') return 'Tersambung ke cloud';
+  if (state.cloudStatus === 'connecting') return 'Menyambungkan ke cloud...';
+  if (state.cloudStatus === 'offline') return 'Offline, tersimpan di HP ini dulu';
+  return '';
+}
+function renderAccessGate() {
+  return '<div style="min-height:100vh;display:flex;align-items:center;justify-content:center;padding:20px;">' +
+    '<div class="card" style="max-width:360px;width:100%;"><div class="card-pad">' +
+    '<div class="font-display" style="font-size:22px;margin-bottom:8px;">Tenang Finance</div>' +
+    '<p class="text-sm ink-soft mb-3">Masukkan Kode Akses kamu. Kalau ini pertama kali, bikin kode bebas (contoh: nama+tanggal lahir). Pakai kode yang sama di HP lain biar datanya sinkron.</p>' +
+    '<input class="input mb-3" id="accessCodeInput" placeholder="Kode akses kamu" />' +
+    '<button class="btn btn-primary btn-block" onclick="setAccessCode()">Lanjutkan</button>' +
+    '</div></div></div>';
+}
+
+/* ================= Kas Harian: filter & total ================= */
+function computeFiltered() {
+  var now = new Date();
+  var y = now.getFullYear(), m = now.getMonth();
+  return state.transactions.filter(function (t) {
+    if (state.filter === 'today') return t.date === todayStr();
+    if (state.filter === 'all') return true;
+    var d = new Date(t.date + 'T00:00:00');
+    return d.getFullYear() === y && d.getMonth() === m;
+  }).sort(function (a, b) { return b.createdAt - a.createdAt; });
+}
+function computeTotals(filtered) {
+  var income = 0, expense = 0;
+  filtered.forEach(function (t) { if (t.type === 'income') income += t.amount; else expense += t.amount; });
+  return { income: income, expense: expense, net: income - expense };
+}
+function setFilter(f) { state.filter = f; render(); }
+function toggleRiwayat() { state.showRiwayat = !state.showRiwayat; render(); }
+
+/* ================= Tally Tip ================= */
+function quickTip(amt) {
+  state.tally = { date: todayStr(), count: state.tally.count + 1, total: state.tally.total + amt };
+  saveData(); render();
+}
+function manualTip() {
+  var amt = parseFloat(state.manualTipAmount);
+  if (!amt || amt <= 0) return;
+  quickTip(amt);
+  state.manualTipAmount = '';
+}
+function recordedTipToday() {
+  var today = todayStr();
+  var t = state.transactions.find(function (x) { return x.type === 'income' && x.category === 'Tip' && x.date === today; });
+  return t ? t.amount : 0;
+}
+function commitTally() {
+  if (!state.tally.total || state.tally.total <= 0) return;
+  var next = mergeTipIntoTransactions(state.transactions, todayStr(), state.tally.total);
+  state.transactions = next;
+  state.tally = { date: todayStr(), count: 0, total: 0 };
+  saveData(); render();
+}
+
+/* ================= Kas Harian: form transaksi ================= */
+function activeCashLoans() {
+  return state.loans.filter(function (l) { return l.loanType === 'tunai' && remainingCashForLoan(l.id) > 0; });
+}
+function remainingCashForLoan(loanId) {
+  var loan = state.loans.find(function (l) { return l.id === loanId; });
+  if (!loan) return 0;
+  var used = state.transactions.filter(function (t) { return t.type === 'expense' && t.sourceLoanId === loanId; })
+    .reduce(function (s, t) { return s + t.amount; }, 0);
+  return Math.max((loan.cashAmount || 0) - used, 0);
+}
+function selectTxType(t) {
+  state.txType = t;
+  state.txShowNewCat = false;
+  state.txNewCatName = '';
+  state.txSourceLoanId = '';
+  var list = state.categories[t];
+  if (list && list.length) state.txCategory = list[0];
+  render();
+}
+function toggleNewCat() { state.txShowNewCat = !state.txShowNewCat; render(); }
+function addCategory() {
+  var name = (document.getElementById('newCatInput') || {}).value;
+  name = (name || '').trim();
+  if (!name) return;
+  if (!state.categories[state.txType].includes(name)) {
+    state.categories[state.txType] = state.categories[state.txType].concat([name]);
+  }
+  state.txCategory = name;
+  state.txShowNewCat = false;
+  saveData(); render();
+}
+function submitTransaction() {
+  var amount = parseFloat((document.getElementById('txAmountInput') || {}).value);
+  var note = ((document.getElementById('txNoteInput') || {}).value || '').trim();
+  var date = (document.getElementById('txDateInput') || {}).value || todayStr();
+  var category = (document.getElementById('txCategorySelect') || {}).value || state.txCategory;
+  var sourceLoanId = (document.getElementById('txSourceLoanSelect') || {}).value || '';
+
+  if (!amount || amount <= 0) { state.txFormError = 'Isi jumlah dulu, harus lebih dari 0.'; render(); return; }
+  state.txFormError = '';
+
+  if (state.txEditingId) {
+    state.transactions = state.transactions.map(function (t) {
+      if (t.id !== state.txEditingId) return t;
+      return Object.assign({}, t, {
+        date: date, type: state.txType, category: category, note: note, amount: amount,
+        sourceLoanId: state.txType === 'expense' ? (sourceLoanId || undefined) : undefined
+      });
+    });
+    cancelEditTx();
+  } else {
+    var tx = {
+      id: uid(), date: date, type: state.txType, category: category, note: note, amount: amount,
+      sourceLoanId: state.txType === 'expense' ? (sourceLoanId || undefined) : undefined,
+      createdAt: Date.now()
+    };
+    state.transactions = [tx].concat(state.transactions);
+    state.txAmount = ''; state.txNote = ''; state.txSourceLoanId = '';
+  }
+  saveData(); render();
+}
+function editTx(id) {
+  var t = state.transactions.find(function (x) { return x.id === id; });
+  if (!t) return;
+  state.txEditingId = id;
+  state.txType = t.type;
+  state.txCategory = t.category;
+  state.txAmount = String(t.amount);
+  state.txNote = t.note || '';
+  state.txDate = t.date;
+  state.txShowNewCat = false;
+  state.txSourceLoanId = t.sourceLoanId || '';
+  render();
+  var card = document.getElementById('txFormCard');
+  if (card) card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+}
+function cancelEditTx() {
+  state.txEditingId = null;
+  state.txType = 'income';
+  state.txCategory = (state.categories.income && state.categories.income[0]) || '';
+  state.txAmount = ''; state.txNote = ''; state.txDate = todayStr();
+  state.txShowNewCat = false; state.txSourceLoanId = ''; state.txFormError = '';
+  render();
+}
+function deleteTx(id) {
+  var target = state.transactions.find(function (t) { return t.id === id; });
+  var next = state.transactions.filter(function (t) { return t.id !== id; });
+
+  if (target && target.loanId) {
+    state.loans = state.loans.map(function (l) {
+      if (l.id !== target.loanId) return l;
+      var newTenorPaid = Math.max((l.tenorPaid || 0) - 1, 0);
+      return Object.assign({}, l, { tenorPaid: newTenorPaid, dueDate: addMonths(l.dueDate, -1) });
+    });
+  }
+  if (target && target.cashLoanId) {
+    state.loans = state.loans.map(function (l) { return l.id === target.cashLoanId ? Object.assign({}, l, { cashTxId: null, cashAmount: 0 }) : l; });
+  }
+  if (target && target.emergencyTxId) {
+    state.emergencyTx = state.emergencyTx.filter(function (e) { return e.id !== target.emergencyTxId; });
+  }
+
+  state.transactions = next;
+  if (state.txEditingId === id) cancelEditTx();
+  saveData(); render();
+}
+
+/* ================= Kesehatan Finansial ================= */
+function avgMonthlyExpense3mo() {
+  var now = new Date();
+  var totalSum = 0, monthsWithData = 0;
+  for (var i = 0; i < 3; i++) {
+    var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    var y = d.getFullYear(), m = d.getMonth();
+    var monthTotal = state.transactions.filter(function (t) { return t.type === 'expense'; })
+      .filter(function (t) { var td = new Date(t.date + 'T00:00:00'); return td.getFullYear() === y && td.getMonth() === m; })
+      .reduce(function (s, t) { return s + t.amount; }, 0);
+    if (monthTotal > 0) { totalSum += monthTotal; monthsWithData++; }
+  }
+  return monthsWithData > 0 ? totalSum / monthsWithData : 0;
+}
+function avgMonthlyIncome3mo() {
+  var now = new Date();
+  var totalSum = 0, monthsWithData = 0;
+  for (var i = 0; i < 3; i++) {
+    var d = new Date(now.getFullYear(), now.getMonth() - i, 1);
+    var y = d.getFullYear(), m = d.getMonth();
+    var monthTotal = state.transactions.filter(function (t) { return t.type === 'income'; })
+      .filter(function (t) { var td = new Date(t.date + 'T00:00:00'); return td.getFullYear() === y && td.getMonth() === m; })
+      .reduce(function (s, t) { return s + t.amount; }, 0);
+    if (monthTotal > 0) { totalSum += monthTotal; monthsWithData++; }
+  }
+  return monthsWithData > 0 ? totalSum / monthsWithData : 0;
+}
+function emergencyBalance() {
+  return state.emergencyTx.reduce(function (sum, t) { return sum + (t.type === 'nabung' ? t.amount : -t.amount); }, 0);
+}
+function emergencyTargetAuto() {
+  return avgMonthlyExpense3mo() * 6;
+}
+function financialHealth() {
+  var now = new Date();
+  var y = now.getFullYear(), m = now.getMonth();
+  var monthTx = state.transactions.filter(function (t) { var d = new Date(t.date + 'T00:00:00'); return d.getFullYear() === y && d.getMonth() === m; });
+  var income = monthTx.filter(function (t) { return t.type === 'income'; }).reduce(function (s, t) { return s + t.amount; }, 0);
+  var expense = monthTx.filter(function (t) { return t.type === 'expense'; }).reduce(function (s, t) { return s + t.amount; }, 0);
+  var savingsRate = income > 0 ? ((income - expense) / income) * 100 : (expense > 0 ? -100 : null);
+
+  var incomeBase = avgMonthlyIncome3mo() > 0 ? avgMonthlyIncome3mo() : income;
+  var activeLoans = state.loans.filter(function (l) { return (l.tenorPaid || 0) < l.tenor; });
+  var monthlyInstallment = activeLoans.reduce(function (s, l) { return s + l.installmentAmount; }, 0);
+  var debtRatio = incomeBase > 0 ? (monthlyInstallment / incomeBase) * 100 : (monthlyInstallment > 0 ? 999 : 0);
+
+  var emBal = emergencyBalance();
+  var avgExp = avgMonthlyExpense3mo();
+  var emergencyMonthsCovered = avgExp > 0 ? emBal / avgExp : null;
+
+  var savingsScore = savingsRate === null ? 12 : savingsRate >= 20 ? 25 : savingsRate >= 10 ? 18 : savingsRate >= 0 ? 10 : 0;
+  var debtScore = debtRatio <= 20 ? 25 : debtRatio <= 36 ? 18 : debtRatio <= 43 ? 10 : 0;
+  var emergencyScore = emergencyMonthsCovered === null ? 12 : emergencyMonthsCovered >= 6 ? 25 : emergencyMonthsCovered >= 3 ? 18 : emergencyMonthsCovered >= 1 ? 10 : 0;
+  var portfolioScore = 12; // modul saham belum ada di versi ini
+
+  var score = Math.round(savingsScore + debtScore + emergencyScore + portfolioScore);
+  var status, color, bg;
+  if (score >= 70) { status = 'Sehat'; color = 'var(--primary)'; bg = '#E3EFE9'; }
+  else if (score >= 40) { status = 'Perlu Perhatian'; color = '#A8791F'; bg = 'var(--income-bg)'; }
+  else { status = 'Waspada'; color = 'var(--expense)'; bg = 'var(--expense-bg)'; }
+
+  var tips = [];
+  if (savingsScore <= 10) tips.push(income > 0 ? 'Tekan pengeluaran non-esensial' : 'Belum ada pemasukan tercatat bulan ini');
+  if (debtScore <= 10) tips.push('Hindari menambah utang baru dulu');
+  if (emergencyScore <= 10) tips.push('Prioritaskan menabung dana darurat');
+  if (tips.length === 0) tips.push('Semua indikator baik, pertahankan!');
+
+  return { score: score, status: status, color: color, bg: bg, tips: tips };
+}
+function renderFinancialHealth() {
+  var fh = financialHealth();
+  return '<div class="fh-banner" style="background:' + fh.bg + ';">' +
+    '<div class="fh-line1" style="color:' + fh.color + ';">' + ICONS.gauge +
+    '<span style="font-weight:700;font-size:14px;">' + fh.status + '</span>' +
+    '<span class="text-xs" style="opacity:.8;">(' + fh.score + '/100)</span></div>' +
+    '<div class="fh-line2" style="color:' + fh.color + ';">' + escapeHtml(fh.tips.join(' \u2022 ')) + '</div>' +
+    '</div>';
+}
+
+/* ================= Pinjaman ================= */
+function resetLoanForm() {
+  state.loanEditingId = null; state.loanAppName = ''; state.loanTenor = ''; state.loanInstallment = '';
+  state.loanDueDate = ''; state.loanType = 'tunai'; state.loanItemName = ''; state.loanCashAmount = ''; state.loanFormError = '';
+}
+function openAddLoan() { resetLoanForm(); state.showLoanForm = true; render(); }
+function cancelLoanForm() { resetLoanForm(); state.showLoanForm = false; render(); }
+function editLoan(id) {
+  var loan = state.loans.find(function (l) { return l.id === id; });
+  if (!loan) return;
+  state.loanEditingId = id; state.loanAppName = loan.appName; state.loanTenor = String(loan.tenor);
+  state.loanInstallment = String(loan.installmentAmount); state.loanDueDate = loan.dueDate;
+  state.loanType = loan.loanType || 'tunai'; state.loanItemName = loan.itemName || '';
+  state.loanCashAmount = loan.cashAmount ? String(loan.cashAmount) : ''; state.loanFormError = '';
+  state.showLoanForm = true; render();
+}
+function submitLoan() {
+  var name = (document.getElementById('loanNameInput') || {}).value.trim();
+  var tenor = parseInt((document.getElementById('loanTenorInput') || {}).value, 10);
+  var installment = parseFloat((document.getElementById('loanInstallmentInput') || {}).value);
+  var dueDate = (document.getElementById('loanDueDateInput') || {}).value;
+  var loanType = state.loanType;
+  var itemName = ((document.getElementById('loanItemNameInput') || {}).value || '').trim();
+  var cashAmount = parseFloat((document.getElementById('loanCashAmountInput') || {}).value) || 0;
+
+  if (!name) { state.loanFormError = 'Isi nama aplikasi pinjaman dulu.'; render(); return; }
+  if (!tenor || tenor <= 0) { state.loanFormError = 'Isi tenor angsuran, harus lebih dari 0.'; render(); return; }
+  if (!installment || installment <= 0) { state.loanFormError = 'Isi nominal cicilan, harus lebih dari 0.'; render(); return; }
+  if (!dueDate) { state.loanFormError = 'Pilih tanggal jatuh tempo.'; render(); return; }
+  if (loanType === 'barang' && !itemName) { state.loanFormError = 'Isi nama barang.'; render(); return; }
+  if (loanType === 'tunai' && cashAmount <= 0) { state.loanFormError = 'Isi nominal tunai diterima.'; render(); return; }
+  state.loanFormError = '';
+
+  var loanId = state.loanEditingId || uid();
+  var existing = state.loanEditingId ? state.loans.find(function (l) { return l.id === state.loanEditingId; }) : null;
+
+  var baseTx = existing && existing.cashTxId ? state.transactions.filter(function (t) { return t.id !== existing.cashTxId; }) : state.transactions;
+  var cashTxId = null;
+  var nextTx = baseTx;
+  if (loanType === 'tunai') {
+    var catName = 'Pinjaman Tunai Diterima';
+    if (!state.categories.income.includes(catName)) state.categories.income = state.categories.income.concat([catName]);
+    cashTxId = uid();
+    nextTx = [{ id: cashTxId, date: existing ? (existing.createdDate || todayStr()) : todayStr(), type: 'income', category: catName,
+      note: 'Pinjaman tunai diterima - ' + name, amount: cashAmount, cashLoanId: loanId, createdAt: Date.now() }].concat(baseTx);
+  }
+
+  if (state.loanEditingId) {
+    state.loans = state.loans.map(function (l) {
+      if (l.id !== state.loanEditingId) return l;
+      return Object.assign({}, l, {
+        appName: name, tenor: tenor, installmentAmount: installment, dueDate: dueDate,
+        tenorPaid: Math.min(l.tenorPaid || 0, tenor), loanType: loanType,
+        itemName: loanType === 'barang' ? itemName : undefined,
+        cashAmount: loanType === 'tunai' ? cashAmount : undefined, cashTxId: cashTxId
+      });
+    });
+  } else {
+    state.loans = [{ id: loanId, appName: name, tenor: tenor, tenorPaid: 0, installmentAmount: installment, dueDate: dueDate,
+      loanType: loanType, itemName: loanType === 'barang' ? itemName : undefined,
+      cashAmount: loanType === 'tunai' ? cashAmount : undefined, cashTxId: cashTxId, createdAt: Date.now() }].concat(state.loans);
+  }
+  state.transactions = nextTx;
+  resetLoanForm(); state.showLoanForm = false;
+  saveData(); render();
+}
+function deleteLoan(id) {
+  var loan = state.loans.find(function (l) { return l.id === id; });
+  var next = state.loans.filter(function (l) { return l.id !== id; });
+  var nextTx = state.transactions;
+  if (loan && loan.cashTxId) nextTx = nextTx.filter(function (t) { return t.id !== loan.cashTxId; });
+  nextTx = nextTx.map(function (t) { return t.sourceLoanId === id ? Object.assign({}, t, { sourceLoanId: undefined }) : t; });
+  state.transactions = nextTx;
+  state.loans = next;
+  if (state.loanEditingId === id) cancelLoanForm();
+  saveData(); render();
+}
+function markLoanPaid(id) {
+  var loan = state.loans.find(function (l) { return l.id === id; });
+  if (!loan) return;
+  var catName = 'Cicilan Pinjaman';
+  if (!state.categories.expense.includes(catName)) state.categories.expense = state.categories.expense.concat([catName]);
+  var installmentNo = (loan.tenorPaid || 0) + 1;
+  var tx = { id: uid(), date: todayStr(), type: 'expense', category: catName,
+    note: 'Cicilan ' + loan.appName + ' (' + installmentNo + '/' + loan.tenor + ')', amount: loan.installmentAmount, loanId: id, createdAt: Date.now() };
+  state.transactions = [tx].concat(state.transactions);
+  state.loans = state.loans.map(function (l) { return l.id === id ? Object.assign({}, l, { tenorPaid: installmentNo, dueDate: addMonths(l.dueDate, 1) }) : l; });
+  saveData(); render();
+}
+function loanReminders() {
+  return state.loans.filter(function (l) { return (l.tenorPaid || 0) < l.tenor && daysUntil(l.dueDate) <= 7; })
+    .sort(function (a, b) { return a.dueDate.localeCompare(b.dueDate); });
+}
+function totalLoanUnpaid() {
+  return state.loans.reduce(function (sum, l) { return sum + Math.max(l.tenor - (l.tenorPaid || 0), 0) * l.installmentAmount; }, 0);
+}
+
+/* ================= Dana Darurat ================= */
+function toggleEmergencyForm() {
+  if (state.showEmergencyForm) { resetEmergencyForm(); state.showEmergencyForm = false; }
+  else { resetEmergencyForm(); state.showEmergencyForm = true; }
+  render();
+}
+function resetEmergencyForm() {
+  state.emergencyEditingId = null; state.emergencyType = 'nabung'; state.emergencyAmount = '';
+  state.emergencyDate = todayStr(); state.emergencyNote = ''; state.emergencyFormError = '';
+}
+function editEmergencyTx(id) {
+  var t = state.emergencyTx.find(function (x) { return x.id === id; });
+  if (!t) return;
+  state.emergencyEditingId = id; state.emergencyType = t.type; state.emergencyAmount = String(t.amount);
+  state.emergencyDate = t.date; state.emergencyNote = t.note || ''; state.emergencyFormError = '';
+  state.showEmergencyForm = true; render();
+}
+function submitEmergencyTx() {
+  var amt = parseFloat((document.getElementById('emergencyAmountInput') || {}).value);
+  var date = (document.getElementById('emergencyDateInput') || {}).value || todayStr();
+  var note = ((document.getElementById('emergencyNoteInput') || {}).value || '').trim();
+  if (!amt || amt <= 0) { state.emergencyFormError = 'Isi nominal lebih dari 0.'; render(); return; }
+  state.emergencyFormError = '';
+
+  var catName = state.emergencyType === 'nabung' ? 'Nabung Dana Darurat' : 'Tarik Dana Darurat';
+  var kasType = state.emergencyType === 'nabung' ? 'expense' : 'income';
+  if (!state.categories[kasType].includes(catName)) state.categories[kasType] = state.categories[kasType].concat([catName]);
+  var noteText = catName + (note ? ' - ' + note : '');
+
+  var emergencyTxId = state.emergencyEditingId || uid();
+  var baseTx = state.emergencyEditingId ? state.transactions.filter(function (t) { return t.emergencyTxId !== emergencyTxId; }) : state.transactions;
+  var existing = state.emergencyEditingId ? state.emergencyTx.find(function (x) { return x.id === state.emergencyEditingId; }) : null;
+
+  var kasTx = { id: uid(), date: date, type: kasType, category: catName, note: noteText, amount: amt, emergencyTxId: emergencyTxId, createdAt: Date.now() };
+  var nextTx = [kasTx].concat(baseTx);
+  var item = { id: emergencyTxId, type: state.emergencyType, amount: amt, date: date, note: note,
+    createdAt: existing ? existing.createdAt : Date.now(), kasTxId: kasTx.id };
+  state.emergencyTx = state.emergencyEditingId ? state.emergencyTx.map(function (x) { return x.id === state.emergencyEditingId ? item : x; }) : [item].concat(state.emergencyTx);
+  state.transactions = nextTx;
+  resetEmergencyForm(); state.showEmergencyForm = false;
+  saveData(); render();
+}
+function deleteEmergencyTx(id) {
+  state.emergencyTx = state.emergencyTx.filter(function (x) { return x.id !== id; });
+  state.transactions = state.transactions.filter(function (t) { return t.emergencyTxId !== id; });
+  if (state.emergencyEditingId === id) resetEmergencyForm();
+  saveData(); render();
+}
+
+/* ================= Perawatan Kendaraan ================= */
+function maintenanceStatusList() {
+  return state.vehicleMaintenanceTypes.map(function (mt) {
+    var list = state.transactions.filter(function (t) { return t.type === 'expense' && t.category === mt.category; })
+      .sort(function (a, b) { return b.date.localeCompare(a.date) || b.createdAt - a.createdAt; });
+    var last = list[0] || null;
+    if (!last) return Object.assign({}, mt, { last: null, dueDate: null, daysOverdue: null, isDue: false });
+    var dueDate = addDays(last.date, mt.intervalDays);
+    var d = daysUntil(dueDate);
+    return Object.assign({}, mt, { last: last, dueDate: dueDate, daysOverdue: d <= 0 ? Math.abs(d) : null, isDue: d <= 0 });
+  });
+}
+function maintenanceReminders() { return maintenanceStatusList().filter(function (m) { return m.isDue; }); }
+function maintenanceDone(typeId) {
+  var mt = maintenanceStatusList().find(function (m) { return m.id === typeId; });
+  if (!mt || !mt.last) return;
+  if (!state.categories.expense.includes(mt.category)) state.categories.expense = state.categories.expense.concat([mt.category]);
+  var tx = { id: uid(), date: todayStr(), type: 'expense', category: mt.category, note: mt.name + ' (reminder otomatis)', amount: mt.last.amount, createdAt: Date.now() };
+  state.transactions = [tx].concat(state.transactions);
+  saveData(); render();
+}
+function toggleVehicleModal() { state.showVehicleModal = !state.showVehicleModal; render(); }
+function toggleVehicleTypeForm() {
+  state.showVehicleTypeForm = !state.showVehicleTypeForm;
+  if (!state.showVehicleTypeForm) { state.vehicleTypeName = ''; state.vehicleTypeInterval = ''; state.vehicleTypeFormError = ''; }
+  render();
+}
+function addVehicleType() {
+  var name = (document.getElementById('vehicleTypeNameInput') || {}).value.trim();
+  var interval = parseInt((document.getElementById('vehicleTypeIntervalInput') || {}).value, 10);
+  if (!name) { state.vehicleTypeFormError = 'Isi nama jenis perawatan dulu.'; render(); return; }
+  if (!interval || interval <= 0) { state.vehicleTypeFormError = 'Isi interval hari, harus lebih dari 0.'; render(); return; }
+  var newType = { id: uid(), name: name, category: name, intervalDays: interval };
+  if (!state.categories.expense.includes(name)) state.categories.expense = state.categories.expense.concat([name]);
+  state.vehicleMaintenanceTypes = state.vehicleMaintenanceTypes.concat([newType]);
+  state.showVehicleTypeForm = false; state.vehicleTypeName = ''; state.vehicleTypeInterval = ''; state.vehicleTypeFormError = '';
+  saveData(); render();
+}
+function deleteVehicleType(id) {
+  state.vehicleMaintenanceTypes = state.vehicleMaintenanceTypes.filter(function (t) { return t.id !== id; });
+  saveData(); render();
+}
+
+/* ================= RENDER: Header & Reminder ================= */
+function renderHeader(totals) {
+  return '<div class="app-header"><div class="container">' +
+    '<div class="row-between mb-2"><div>' +
+    '<p class="eyebrow">Project Tenang</p>' +
+    '<div class="font-display title">Tenang Finance</div>' +
+    '</div>' + (cloudStatusLabel() ? '<p class="save-indicator">' + cloudStatusLabel() + '</p>' : '') + '</div>' +
+    '<div class="stat-grid">' +
+    '<div class="stat-box"><div class="stat-label">' + ICONS.up + ' Pemasukan</div><div class="mono stat-value">' + formatRupiah(totals.income) + '</div></div>' +
+    '<div class="stat-box"><div class="stat-label">' + ICONS.down + ' Pengeluaran</div><div class="mono stat-value">' + formatRupiah(totals.expense) + '</div></div>' +
+    '<div class="stat-box highlight"><div class="stat-label">' + ICONS.wallet + ' Saldo Bersih</div><div class="mono stat-value">' + formatRupiah(totals.net) + '</div></div>' +
+    '</div></div></div>';
+}
+function renderReminderBanner() {
+  var lr = loanReminders(), mr = maintenanceReminders();
+  if (lr.length === 0 && mr.length === 0) return '';
+  var items = lr.map(function (loan) {
+    var d = daysUntil(loan.dueDate);
+    var statusText = d < 0 ? ('Lewat ' + Math.abs(d) + ' hari') : d === 0 ? 'Jatuh tempo hari ini' : (d + ' hari lagi');
+    return '<div class="item"><div><div class="name">' + escapeHtml(loan.appName) + '</div>' +
+      '<div class="meta">' + statusText + ' &middot; ' + formatRupiah(loan.installmentAmount) + '</div></div>' +
+      '<button class="btn-white" onclick="markLoanPaid(\'' + loan.id + '\')">Sudah Dibayar</button></div>';
+  }).join('');
+  items += mr.map(function (mt) {
+    return '<div class="item"><div><div class="name">' + escapeHtml(mt.name) + '</div>' +
+      '<div class="meta">' + (mt.daysOverdue === 0 ? 'Jatuh tempo hari ini' : ('Lewat ' + mt.daysOverdue + ' hari')) + ' &middot; ' + formatRupiah(mt.last.amount) + '</div></div>' +
+      '<button class="btn-white" onclick="maintenanceDone(\'' + mt.id + '\')">Sudah ' + escapeHtml(mt.name) + '</button></div>';
+  }).join('');
+  return '<div class="banner-danger"><div class="head">' + ICONS.alert + ' Reminder Penting</div>' + items + '</div>';
+}
+
+/* ================= RENDER: Tally Tip ================= */
+function renderTallyCard() {
+  var presets = TIP_PRESETS.map(function (p) { return '<button class="chip" onclick="quickTip(' + p + ')">+' + formatRupiah(p) + '</button>'; }).join('');
+  return '<div class="card"><div class="card-pad">' +
+    '<div class="row-between mb-2"><div class="card-title" style="font-size:14px;">' + ICONS.coins + ' Tally Tip</div>' +
+    '<div class="digit-box">' + String(state.tally.count).padStart(2, '0') + '&times;</div></div>' +
+    '<div class="chip-row">' + presets +
+    '<input class="input" style="width:90px;padding:6px 8px;font-size:12px;" placeholder="Rp lain" id="manualTipInput" value="' + escapeHtml(state.manualTipAmount) + '" oninput="state.manualTipAmount=this.value" onkeydown="if(event.key===\'Enter\')manualTip()" />' +
+    '<button class="chip" onclick="manualTip()">+</button></div>' +
+    '<div class="row-between text-xs ink-soft mb-2"><span>Sisa <b class="mono" style="color:var(--ink)">' + formatRupiah(state.tally.total) + '</b> &middot; Tercatat <b class="mono" style="color:var(--ink)">' + formatRupiah(recordedTipToday()) + '</b></span>' +
+    '<button class="btn btn-primary btn-sm" ' + (state.tally.total > 0 ? '' : 'disabled') + ' onclick="commitTally()">Setor</button></div>' +
+    '</div></div>';
+}
+
+/* ================= RENDER: Form Transaksi ================= */
+function renderTxForm() {
+  var cats = state.categories[state.txType] || [];
+  var catOptions = cats.map(function (c) { return '<option value="' + escapeHtml(c) + '" ' + (c === state.txCategory ? 'selected' : '') + '>' + escapeHtml(c) + '</option>'; }).join('');
+  var cashLoans = activeCashLoans();
+  var sourceLoanHtml = '';
+  if (state.txType === 'expense' && cashLoans.length > 0) {
+    var opts = '<option value="">Kas Biasa</option>' + cashLoans.map(function (l) {
+      return '<option value="' + l.id + '" ' + (state.txSourceLoanId === l.id ? 'selected' : '') + '>Pinjaman ' + escapeHtml(l.appName) + ' - Sisa ' + formatRupiah(remainingCashForLoan(l.id)) + '</option>';
+    }).join('');
+    sourceLoanHtml = '<div class="mb-2"><label class="field-label">Sumber Dana</label>' +
+      '<select class="input" id="txSourceLoanSelect" onchange="state.txSourceLoanId=this.value">' + opts + '</select></div>';
+  }
+  return '<div class="card" id="txFormCard"><div class="card-pad">' +
+    '<div class="row-between mb-2"><div class="card-title" style="font-size:14px;">' + (state.txEditingId ? 'Edit Transaksi' : 'Catat Transaksi') + '</div>' +
+    (state.txEditingId ? '<button class="btn btn-outline btn-sm" onclick="cancelEditTx()">' + ICONS.x + ' Batal</button>' : '') + '</div>' +
+    '<div class="type-toggle">' +
+    '<button class="' + (state.txType === 'income' ? 'active-income' : '') + '" onclick="selectTxType(\'income\')">Pemasukan</button>' +
+    '<button class="' + (state.txType === 'expense' ? 'active-expense' : '') + '" onclick="selectTxType(\'expense\')">Pengeluaran</button>' +
+    '</div>' +
+    '<div class="form-row-2">' +
+    '<div><label class="field-label">Kategori</label>' +
+    (state.txShowNewCat ?
+      '<div style="display:flex;gap:4px;"><input class="input" id="newCatInput" placeholder="Nama kategori" /><button class="btn btn-primary" style="padding:0 10px;" onclick="addCategory()">' + ICONS.check + '</button></div>' :
+      '<select class="input" id="txCategorySelect" onchange="if(this.value===\'__new__\'){toggleNewCat();}else{state.txCategory=this.value;}">' + catOptions + '<option value="__new__">+ Kategori baru...</option></select>') +
+    '</div>' +
+    '<div><label class="field-label">Tanggal</label><input class="input" type="date" id="txDateInput" value="' + state.txDate + '" onchange="state.txDate=this.value" /></div>' +
+    '</div>' +
+    '<div class="form-row-2">' +
+    '<div><label class="field-label">Jumlah (Rp)</label><input class="input ' + (state.txFormError ? 'error' : '') + '" type="number" id="txAmountInput" placeholder="0" value="' + escapeHtml(state.txAmount) + '" oninput="state.txAmount=this.value" /></div>' +
+    '<div><label class="field-label">Keterangan</label><input class="input" id="txNoteInput" placeholder="Opsional" value="' + escapeHtml(state.txNote) + '" oninput="state.txNote=this.value" /></div>' +
+    '</div>' +
+    sourceLoanHtml +
+    (state.txFormError ? '<p class="error-text">' + escapeHtml(state.txFormError) + '</p>' : '') +
+    '<button class="btn btn-primary btn-block" onclick="submitTransaction()">' + ICONS.check + ' ' + (state.txEditingId ? 'Update Transaksi' : 'Simpan Transaksi') + '</button>' +
+    '</div></div>';
+}
+
+/* ================= RENDER: Riwayat (collapsible) ================= */
+function renderRiwayat(filtered) {
+  var rows = filtered.map(function (t) {
+    var rowClass = t.type === 'income' ? 'row-income' : '';
+    var canEdit = !t.loanId && !t.cashLoanId && !t.emergencyTxId;
+    return '<tr class="' + rowClass + '"><td class="text-xs" style="white-space:nowrap;">' + formatDMY(t.date).slice(0, 5) + '</td>' +
+      '<td class="text-xs">' + escapeHtml(t.category) + (t.note ? ' <span class="ink-soft">- ' + escapeHtml(t.note) + '</span>' : '') + '</td>' +
+      '<td class="mono text-xs ' + (t.type === 'income' ? 'amount-income' : 'amount-expense') + '" style="text-align:right;">' + (t.type === 'income' ? '+' : '-') + formatRupiah(t.amount) + '</td>' +
+      '<td style="text-align:right;white-space:nowrap;">' +
+      (canEdit ? '<button class="icon-btn" onclick="editTx(\'' + t.id + '\')">' + ICONS.pencil + '</button>' : '') +
+      '<button class="icon-btn" onclick="deleteTx(\'' + t.id + '\')">' + ICONS.trash + '</button></td></tr>';
+  }).join('');
+  var body = state.showRiwayat ?
+    ('<div class="pill-row" style="padding:12px 16px 4px;">' +
+      '<button class="pill ' + (state.filter === 'today' ? 'active' : '') + '" onclick="setFilter(\'today\')">Hari Ini</button>' +
+      '<button class="pill ' + (state.filter === 'month' ? 'active' : '') + '" onclick="setFilter(\'month\')">Satu Bulan</button>' +
+      '<button class="pill ' + (state.filter === 'all' ? 'active' : '') + '" onclick="setFilter(\'all\')">Semua</button></div>' +
+      (filtered.length === 0 ? '<div class="empty-state">Belum ada transaksi.</div>' :
+        '<div class="table-wrap"><table><tbody>' + rows + '</tbody></table></div>')) : '';
+  return '<div class="card">' +
+    '<button class="card-head" style="width:100%;background:none;border:none;cursor:pointer;text-align:left;" onclick="toggleRiwayat()">' +
+    '<span class="card-title">Riwayat Transaksi</span>' +
+    '<span class="text-xs ink-soft" style="display:flex;align-items:center;gap:6px;">' + filtered.length + ' transaksi ' + ICONS.chevron + '</span></button>' +
+    body + '</div>';
+}
+
+/* ================= RENDER: Pinjaman ================= */
+function renderLoanForm() {
+  return '<div class="card-pad" style="border-top:1px solid var(--line);">' +
+    '<div class="form-row-2">' +
+    '<div><label class="field-label">Nama Aplikasi</label><input class="input" id="loanNameInput" value="' + escapeHtml(state.loanAppName) + '" oninput="state.loanAppName=this.value" /></div>' +
+    '<div><label class="field-label">Tenor (bulan)</label><input class="input" type="number" id="loanTenorInput" value="' + escapeHtml(state.loanTenor) + '" oninput="state.loanTenor=this.value" /></div>' +
+    '</div>' +
+    '<div class="form-row-2">' +
+    '<div><label class="field-label">Cicilan/bulan (Rp)</label><input class="input" type="number" id="loanInstallmentInput" value="' + escapeHtml(state.loanInstallment) + '" oninput="state.loanInstallment=this.value" /></div>' +
+    '<div><label class="field-label">Tgl Jatuh Tempo</label><input class="input" type="date" id="loanDueDateInput" value="' + state.loanDueDate + '" onchange="state.loanDueDate=this.value" /></div>' +
+    '</div>' +
+    '<div class="mb-2"><label class="field-label">Bentuk Pinjaman</label><div class="type-toggle">' +
+    '<button class="' + (state.loanType === 'tunai' ? 'active-income' : '') + '" onclick="state.loanType=\'tunai\';render()">Tunai / Cash</button>' +
+    '<button class="' + (state.loanType === 'barang' ? 'active-expense' : '') + '" onclick="state.loanType=\'barang\';render()">Barang</button>' +
+    '</div></div>' +
+    (state.loanType === 'tunai' ?
+      '<div class="mb-2"><label class="field-label">Nominal Tunai Diterima (Rp)</label><input class="input" type="number" id="loanCashAmountInput" value="' + escapeHtml(state.loanCashAmount) + '" oninput="state.loanCashAmount=this.value" /><p class="text-xs ink-soft mt-1">Otomatis tercatat sebagai pemasukan.</p></div>' :
+      '<div class="mb-2"><label class="field-label">Nama Barang</label><input class="input" id="loanItemNameInput" placeholder="Contoh: HP, Motor" value="' + escapeHtml(state.loanItemName) + '" oninput="state.loanItemName=this.value" /></div>') +
+    (state.loanFormError ? '<p class="error-text">' + escapeHtml(state.loanFormError) + '</p>' : '') +
+    '<button class="btn btn-primary btn-block" onclick="submitLoan()">' + ICONS.check + ' ' + (state.loanEditingId ? 'Update Pinjaman' : 'Simpan Pinjaman') + '</button>' +
+    '</div>';
+}
+function renderLoanList() {
+  if (state.loans.length === 0) return '<div class="empty-state">Belum ada pinjaman tercatat.</div>';
+  return state.loans.map(function (loan) {
+    var sisaAngsuran = Math.max(loan.tenor - (loan.tenorPaid || 0), 0);
+    var isFinished = sisaAngsuran === 0;
+    var d = daysUntil(loan.dueDate);
+    var statusText = isFinished ? '' : (d < 0 ? ('Lewat ' + Math.abs(d) + ' hari') : d === 0 ? 'Jatuh tempo hari ini' : '');
+    var remaining = loan.loanType === 'tunai' ? remainingCashForLoan(loan.id) : null;
+    return '<div class="loan-row">' +
+      '<div class="row-between mb-1"><div class="text-sm" style="font-weight:600;">' + escapeHtml(loan.appName) + (isFinished ? ' <span class="badge-paid">Lunas</span>' : '') + '</div>' +
+      '<div><button class="icon-btn" onclick="editLoan(\'' + loan.id + '\')">' + ICONS.pencil + '</button><button class="icon-btn" onclick="deleteLoan(\'' + loan.id + '\')">' + ICONS.trash + '</button></div></div>' +
+      '<div class="text-xs ink-soft">Sisa angsuran: ' + sisaAngsuran + '/' + loan.tenor + ' bulan' + (!isFinished ? (' &middot; jatuh tempo ' + formatDMY(loan.dueDate)) : '') + '</div>' +
+      (loan.loanType ? ('<div class="text-xs ink-soft mt-1">' + (loan.loanType === 'barang' ? ('Barang: ' + escapeHtml(loan.itemName || '-')) : ('Tunai: ' + formatRupiah(loan.cashAmount || 0) + ' diterima')) + '</div>') : '') +
+      (loan.loanType === 'tunai' ? ('<div class="text-xs mt-1" style="font-weight:600;color:' + (remaining > 0 ? 'var(--income)' : 'var(--ink-soft)') + ';">Sisa uang belum terpakai: ' + formatRupiah(remaining) + '</div>') : '') +
+      (statusText ? '<div class="text-xs mt-1" style="font-weight:600;color:var(--expense);">' + statusText + '</div>' : '') +
+      (!isFinished ? '<button class="btn btn-primary btn-sm mt-1" onclick="markLoanPaid(\'' + loan.id + '\')">Tandai Sudah Dibayar Bulan Ini</button>' : '') +
+      '</div>';
+  }).join('');
+}
+function renderLoanCard() {
+  return '<div class="card">' +
+    '<div class="card-head"><div class="card-title">' + ICONS.landmark + ' Pinjaman</div>' +
+    '<button class="btn btn-soft-income btn-sm" onclick="' + (state.showLoanForm ? 'cancelLoanForm()' : 'openAddLoan()') + '">' + (state.showLoanForm ? (ICONS.x + ' Tutup') : (ICONS.plus + ' Tambah')) + '</button></div>' +
+    '<div class="card-pad" style="padding-bottom:8px;"><div class="loan-stat-box"><div class="text-xs" style="color:var(--expense);">Total Pinjaman Belum Dibayar</div><div class="mono text-sm" style="font-weight:700;color:var(--expense);">' + formatRupiah(totalLoanUnpaid()) + '</div></div></div>' +
+    (state.showLoanForm ? renderLoanForm() : '') +
+    renderLoanList() +
+    '</div>';
+}
+
+/* ================= RENDER: Dana Darurat ================= */
+function renderEmergencyForm() {
+  return '<div class="card-pad" style="border-top:1px solid var(--line);">' +
+    '<div class="type-toggle">' +
+    '<button class="' + (state.emergencyType === 'nabung' ? 'active-expense' : '') + '" onclick="state.emergencyType=\'nabung\';render()">Nabung</button>' +
+    '<button class="' + (state.emergencyType === 'tarik' ? 'active-income' : '') + '" onclick="state.emergencyType=\'tarik\';render()">Tarik</button>' +
+    '</div>' +
+    '<div class="form-row-2">' +
+    '<div><label class="field-label">Nominal (Rp)</label><input class="input" type="number" id="emergencyAmountInput" value="' + escapeHtml(state.emergencyAmount) + '" oninput="state.emergencyAmount=this.value" /></div>' +
+    '<div><label class="field-label">Tanggal</label><input class="input" type="date" id="emergencyDateInput" value="' + state.emergencyDate + '" onchange="state.emergencyDate=this.value" /></div>' +
+    '</div>' +
+    '<div class="mb-2"><label class="field-label">Catatan (opsional)</label><input class="input" id="emergencyNoteInput" value="' + escapeHtml(state.emergencyNote) + '" oninput="state.emergencyNote=this.value" /></div>' +
+    (state.emergencyFormError ? '<p class="error-text">' + escapeHtml(state.emergencyFormError) + '</p>' : '') +
+    '<button class="btn btn-primary btn-block" onclick="submitEmergencyTx()">' + ICONS.check + ' ' + (state.emergencyEditingId ? 'Update Transaksi' : 'Simpan Transaksi') + '</button>' +
+    '<p class="text-xs ink-soft mt-1">Nabung otomatis tercatat sebagai pengeluaran, Tarik sebagai pemasukan.</p>' +
+    '</div>';
+}
+function renderEmergencyCard() {
+  var bal = emergencyBalance();
+  var target = emergencyTargetAuto();
+  var pct = target > 0 ? Math.min(Math.max((bal / target) * 100, 0), 100) : 0;
+  var list = state.emergencyTx.slice().sort(function (a, b) { return b.createdAt - a.createdAt; });
+  var rows = list.map(function (t) {
+    var color = t.type === 'nabung' ? 'var(--expense)' : 'var(--income)';
+    return '<div class="loan-row" style="padding:8px 16px;"><div class="row-between"><div>' +
+      '<div class="text-sm" style="font-weight:600;color:' + color + ';">' + (t.type === 'nabung' ? 'Nabung' : 'Tarik') + '</div>' +
+      '<div class="text-xs ink-soft">' + formatDMY(t.date).slice(0, 5) + (t.note ? (' &middot; ' + escapeHtml(t.note)) : '') + '</div></div>' +
+      '<div style="display:flex;align-items:center;gap:6px;"><div class="mono text-sm" style="font-weight:600;color:' + color + ';">' + (t.type === 'nabung' ? '+' : '-') + formatRupiah(t.amount) + '</div>' +
+      '<button class="icon-btn" onclick="editEmergencyTx(\'' + t.id + '\')">' + ICONS.pencil + '</button>' +
+      '<button class="icon-btn" onclick="deleteEmergencyTx(\'' + t.id + '\')">' + ICONS.trash + '</button></div></div></div>';
+  }).join('');
+  return '<div class="card">' +
+    '<div class="card-head"><div class="card-title">' + ICONS.shield + ' Dana Darurat</div>' +
+    '<button class="btn btn-soft-income btn-sm" onclick="toggleEmergencyForm()">' + (state.showEmergencyForm ? (ICONS.x + ' Tutup') : (ICONS.plus + ' Tambah')) + '</button></div>' +
+    '<div class="card-pad">' +
+    '<div class="row-between mb-1"><div><div class="text-xs ink-soft">Terkumpul</div><div class="mono text-sm" style="font-weight:600;">' + formatRupiah(bal) + '</div></div>' +
+    '<div style="text-align:right;"><div class="text-xs ink-soft">Target Otomatis</div><div class="mono text-sm">' + (target > 0 ? formatRupiah(target) : 'Belum ada data') + '</div></div></div>' +
+    (target > 0 ? ('<div style="height:8px;background:var(--bg);border-radius:999px;overflow:hidden;"><div style="height:8px;width:' + pct + '%;background:var(--income);"></div></div>' +
+      '<div class="text-xs ink-soft mt-1">' + pct.toFixed(0) + '% dari target &middot; 6 bulan pengeluaran</div>') : '') +
+    '</div>' +
+    (state.showEmergencyForm ? renderEmergencyForm() : '') +
+    rows +
+    '</div>';
+}
+
+/* ================= RENDER: Perawatan Kendaraan ================= */
+function renderVehicleTypeForm() {
+  return '<div class="card-pad" style="border-top:1px solid var(--line);">' +
+    '<div class="form-row-2">' +
+    '<div><label class="field-label">Nama Perawatan</label><input class="input" id="vehicleTypeNameInput" placeholder="Contoh: Ganti Ban" value="' + escapeHtml(state.vehicleTypeName) + '" oninput="state.vehicleTypeName=this.value" /></div>' +
+    '<div><label class="field-label">Interval (hari)</label><input class="input" type="number" id="vehicleTypeIntervalInput" placeholder="90" value="' + escapeHtml(state.vehicleTypeInterval) + '" oninput="state.vehicleTypeInterval=this.value" /></div>' +
+    '</div>' +
+    (state.vehicleTypeFormError ? '<p class="error-text">' + escapeHtml(state.vehicleTypeFormError) + '</p>' : '') +
+    '<button class="btn btn-primary btn-block" onclick="addVehicleType()">' + ICONS.check + ' Simpan Jenis Perawatan</button>' +
+    '</div>';
+}
+function renderVehicleModal() {
+  if (!state.showVehicleModal) return '';
+  var list = maintenanceStatusList();
+  var rows = list.map(function (mt) {
+    return '<div class="loan-row"><div class="row-between mb-1"><div class="text-sm" style="font-weight:600;">' + escapeHtml(mt.name) + '</div>' +
+      '<button class="icon-btn" onclick="deleteVehicleType(\'' + mt.id + '\')">' + ICONS.trash + '</button></div>' +
+      '<div class="text-xs ink-soft">Interval ' + mt.intervalDays + ' hari' + (mt.last ? (' &middot; terakhir ' + formatDMY(mt.last.date)) : ' &middot; belum ada riwayat') + '</div>' +
+      (mt.isDue ? ('<div class="text-xs mt-1" style="font-weight:600;color:var(--expense);">' + (mt.daysOverdue === 0 ? 'Jatuh tempo hari ini' : ('Lewat ' + mt.daysOverdue + ' hari')) + '</div>') :
+        mt.dueDate ? ('<div class="text-xs mt-1" style="color:var(--income);">Jatuh tempo berikutnya: ' + formatDMY(mt.dueDate) + '</div>') :
+          ('<div class="text-xs mt-1 ink-soft" style="font-style:italic;">Catat transaksi kategori "' + escapeHtml(mt.category) + '" dulu.</div>')) +
+      '</div>';
+  }).join('');
+  return '<div class="modal-overlay" onclick="toggleVehicleModal()"><div class="modal-box" style="max-width:420px;max-height:80vh;overflow:auto;" onclick="event.stopPropagation()">' +
+    '<div class="row-between mb-2"><div class="font-display" style="font-size:18px;">' + ICONS.wrench + ' Perawatan Kendaraan</div>' +
+    '<button class="btn btn-soft-income btn-sm" onclick="toggleVehicleTypeForm()">' + (state.showVehicleTypeForm ? (ICONS.x + ' Tutup') : (ICONS.plus + ' Tambah Jenis')) + '</button></div>' +
+    (state.showVehicleTypeForm ? renderVehicleTypeForm() : '') +
+    (list.length === 0 ? '<div class="empty-state">Belum ada jenis perawatan.</div>' : rows) +
+    '</div></div>';
+}
+function renderVehicleLauncher() {
+  var mr = maintenanceReminders();
+  return '<button class="card row-between" style="width:100%;padding:14px 16px;background:var(--card);border:1px solid var(--line);cursor:pointer;text-align:left;" onclick="toggleVehicleModal()">' +
+    '<span class="card-title">' + ICONS.wrench + ' Perawatan Kendaraan</span>' +
+    '<span class="text-xs" style="color:' + (mr.length > 0 ? 'var(--expense)' : 'var(--ink-soft)') + ';">' + (mr.length > 0 ? (mr.length + ' jatuh tempo') : (state.vehicleMaintenanceTypes.length + ' jenis')) + '</span>' +
+    '</button>';
+}
+
+/* ================= RENDER: Backup & Restore ================= */
+function backupPayloadString() {
+  var payload = Object.assign({ version: 1, exportedAt: new Date().toISOString() }, currentDataForSave());
+  return JSON.stringify(payload, null, 2);
+}
+function toggleBackupPanel() { state.showBackupPanel = !state.showBackupPanel; render(); }
+function downloadBackup() {
+  var blob = new Blob([backupPayloadString()], { type: 'application/json' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'kas-harian-backup-' + todayStr() + '.json';
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+function copyBackup() {
+  navigator.clipboard.writeText(backupPayloadString()).then(function () {
+    state.backupMsg = 'Berhasil disalin ke clipboard.'; render();
+  }).catch(function () { state.backupMsg = 'Gagal menyalin, coba unduh saja.'; render(); });
+}
+function handleRestoreFile(input) {
+  var file = input.files && input.files[0];
+  if (!file) return;
+  var reader = new FileReader();
+  reader.onload = function (e) {
+    try {
+      var obj = JSON.parse(e.target.result);
+      if (!isValidBackup(obj)) { state.restoreMsg = 'File tidak valid.'; render(); return; }
+      state.pendingRestore = obj; render();
+    } catch (err) { state.restoreMsg = 'Gagal membaca file.'; render(); }
+  };
+  reader.readAsText(file);
+}
+function restoreFromText() {
+  try {
+    var obj = JSON.parse(state.restoreText);
+    if (!isValidBackup(obj)) { state.restoreMsg = 'Teks tidak valid.'; render(); return; }
+    state.pendingRestore = obj; render();
+  } catch (e) { state.restoreMsg = 'Gagal membaca teks.'; render(); }
+}
+function cancelRestore() { state.pendingRestore = null; render(); }
+function confirmRestore() {
+  applyLoadedData(state.pendingRestore);
+  state.pendingRestore = null;
+  state.restoreText = ''; state.restoreMsg = 'Data berhasil dipulihkan.';
+  saveData(); render();
+}
+function renderRestoreModal() {
+  if (!state.pendingRestore) return '';
+  var p = state.pendingRestore;
+  var txCount = (p.transactions || []).length;
+  return '<div class="modal-overlay"><div class="modal-box">' +
+    '<div class="font-display" style="font-size:18px;margin-bottom:8px;">Pulihkan data ini?</div>' +
+    '<p class="text-sm ink-soft mb-1">Backup berisi <b style="color:var(--ink);">' + txCount + ' transaksi</b>.</p>' +
+    '<p class="text-sm mb-3" style="color:var(--expense);">Data yang ada sekarang akan ditimpa.</p>' +
+    '<div style="display:flex;gap:8px;"><button class="btn btn-outline flex-1" onclick="cancelRestore()">Batal</button>' +
+    '<button class="btn flex-1" style="background:var(--expense);color:#fff;" onclick="confirmRestore()">Ya, Timpa Data</button></div>' +
+    '</div></div>';
+}
+function renderBackupCard() {
+  return '<div class="card"><div class="card-head"><div class="card-title">' + ICONS.shield + ' Backup & Restore</div></div>' +
+    '<div class="card-pad">' +
+    '<button class="btn btn-outline btn-block mb-2" onclick="downloadBackup()">' + ICONS.download + ' Unduh Backup</button>' +
+    '<button class="btn btn-outline btn-block mb-2" onclick="copyBackup()">' + ICONS.copy + ' Salin ke Clipboard</button>' +
+    (state.backupMsg ? '<p class="text-xs mb-2" style="color:var(--primary);">' + escapeHtml(state.backupMsg) + '</p>' : '') +
+    '<label class="field-label">Pulihkan dari File</label>' +
+    '<input type="file" accept="application/json" class="input mb-2" onchange="handleRestoreFile(this)" />' +
+    '<label class="field-label">Atau Tempel Teks Backup</label>' +
+    '<textarea class="input mb-2" rows="3" oninput="state.restoreText=this.value">' + escapeHtml(state.restoreText) + '</textarea>' +
+    '<button class="btn btn-outline btn-block" onclick="restoreFromText()">' + ICONS.upload + ' Pulihkan dari Teks</button>' +
+    (state.restoreMsg ? '<p class="text-xs mt-2">' + escapeHtml(state.restoreMsg) + '</p>' : '') +
+    '<button class="btn btn-outline btn-block mt-2" style="color:var(--ink-soft);" onclick="gantiKodeAkses()">Ganti Kode Akses</button>' +
+    '</div></div>';
+}
+
+/* ================= MAIN RENDER ================= */
+function render() {
+  if (!accessCode) {
+    document.getElementById('root').innerHTML = renderAccessGate();
+    return;
+  }
+  var filtered = computeFiltered();
+  var totals = computeTotals(filtered);
+
+  var html = renderHeader(totals) +
+    '<div class="content"><div class="container">' +
+    renderFinancialHealth() +
+    renderTallyCard() +
+    renderReminderBanner() +
+    renderTxForm() +
+    renderRiwayat(filtered) +
+    renderLoanCard() +
+    renderEmergencyCard() +
+    renderVehicleLauncher() +
+    renderBackupCard() +
+    '</div></div>' +
+    renderRestoreModal() +
+    renderVehicleModal();
+
+  document.getElementById('root').innerHTML = html;
+}
+
+/* ================= Init ================= */
+document.addEventListener('DOMContentLoaded', function () {
+  loadData();
+  render();
+  if (accessCode) initCloudSync();
+});
+</script>
+</body>
+</html>
